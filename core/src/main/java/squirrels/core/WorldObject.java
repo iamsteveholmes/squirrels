@@ -6,6 +6,8 @@ import playn.core.Image;
 public class WorldObject {
 
     public Image img;
+    public Image img2;
+    boolean isImg = true;
     public double oldx, oldy, oldz;
     public double x, y, z;
     public double vx, vy, vz;
@@ -16,8 +18,38 @@ public class WorldObject {
     int lastUpdated;
     boolean resting;
 
+    long oldUpdateTime = System.currentTimeMillis();
+
+    public Image getImage(){
+        if(img2 == null) return img;
+        if(updateImage()){
+            isImg = !isImg;
+        }
+        Image returnImage;
+        if(isImg) {
+            returnImage = img;
+        } else returnImage = img2;
+
+        return returnImage;
+    }
+
+    boolean updateImage(){
+        long newUpdateTime = System.currentTimeMillis();
+        if(newUpdateTime - oldUpdateTime > 500){
+            oldUpdateTime = newUpdateTime;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public WorldObject( Image img ) {
         this.img = img;
+    }
+
+    public WorldObject( Image img, Image img2 ) {
+        this.img = img;
+        this.img2 = img2;
     }
 
     public boolean isResting() {

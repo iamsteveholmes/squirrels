@@ -494,7 +494,7 @@ public class SquirrelWorld {
                 int py = worldToPixelY( surf, o.y( alpha ), o.z( alpha ) );
                 float baseX = o.img.width() / 2;
                 float baseY = o.img.height() - OBJECT_BASE;
-                surf.drawImage( o.img, px - baseX, py - baseY );
+                surf.drawImage( o.getImage(), px - baseX, py - baseY );
             }
         }
     }

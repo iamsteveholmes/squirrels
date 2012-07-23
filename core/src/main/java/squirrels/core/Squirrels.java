@@ -28,7 +28,7 @@ public class Squirrels implements Game/*, Keyboard.Listener*/ {
     private float frameAlpha;
 
     private SquirrelWorld world;
-    private WorldObject catGirl;
+    private WorldObject squirrel;
     private WorldObject[] stars;
 
     /*private boolean controlLeft, controlRight, controlUp, controlDown;
@@ -110,7 +110,7 @@ public class Squirrels implements Game/*, Keyboard.Listener*/ {
         // create an immediate layer that handles all of our rendering
         gameLayer = graphics().createImmediateLayer( new ImmediateLayer.Renderer() {
             public void render( Surface surface ) {
-                world.setViewOrigin( catGirl.x( frameAlpha ), catGirl.y( frameAlpha ), catGirl.z( frameAlpha ) );
+                world.setViewOrigin( squirrel.x( frameAlpha ), squirrel.y( frameAlpha ), squirrel.z( frameAlpha ) );
                 surface.clear();
                 world.paint( surface, frameAlpha );
             }
@@ -121,10 +121,10 @@ public class Squirrels implements Game/*, Keyboard.Listener*/ {
     }
 
     private void initStuff() {
-        catGirl = new WorldObject( assets().getImage( "images/character_cat_girl.png" ) );
-        catGirl.setPos( 2, 2, 1 );
-        catGirl.r = 0.3;
-        world.addObject( catGirl );
+        squirrel = new WorldObject( assets().getImage( "images/squirrels_1.png" ), assets().getImage( "images/squirrels_2.png" ) );
+        squirrel.setPos( 2, 2, 1 );
+        squirrel.r = 0.3;
+        world.addObject( squirrel );
 
         stars = new WorldObject[ NUM_STARS ];
         for ( int i = 0; i < NUM_STARS; ++i ) {
@@ -194,9 +194,9 @@ public class Squirrels implements Game/*, Keyboard.Listener*/ {
             return;
         }
 
-        catGirl.setAcceleration( 0, 0, 0 );
+        squirrel.setAcceleration( 0, 0, 0 );
 
-        if ( catGirl.isResting() ) {
+        if ( squirrel.isResting() ) {
             // Keyboard control.
             /*if ( controlLeft ) {
                 catGirl.ax = -1.0;
@@ -212,8 +212,8 @@ public class Squirrels implements Game/*, Keyboard.Listener*/ {
             }*/
 
             // Mouse Control.
-            catGirl.ax += touchVectorX;
-            catGirl.ay += touchVectorY;
+            squirrel.ax += touchVectorX;
+            squirrel.ay += touchVectorY;
 
             // Jump Control.
             /*if ( controlJump ) {
