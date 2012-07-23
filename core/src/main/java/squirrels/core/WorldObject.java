@@ -3,7 +3,7 @@ package squirrels.core;
 
 import playn.core.Image;
 
-public class CuteObject {
+public class WorldObject {
 
     public Image img;
     public double oldx, oldy, oldz;
@@ -16,7 +16,7 @@ public class CuteObject {
     int lastUpdated;
     boolean resting;
 
-    public CuteObject( Image img ) {
+    public WorldObject( Image img ) {
         this.img = img;
     }
 

@@ -18,6 +18,7 @@ package squirrels.core;
 
 import static java.lang.Math.*;
 import static playn.core.PlayN.*;
+import static squirrels.core.SquirrelWorld.TileImage.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,22 +31,53 @@ public class SquirrelWorld {
 
     static class Stack {
         int[] tiles;
-        List<CuteObject> objects = new ArrayList<CuteObject>();
+        List<WorldObject> objects = new ArrayList<WorldObject>();
 
         int height() {
             return tiles.length;
         }
     }
 
+    enum TileImage {
+        BLOCK_BROWN(0, "block_brown"),
+        BLOCK_DIRT(1, "block_dirt" ),
+        BLOCK_GRASS(2, "block_grass"),
+        BLOCK_PLAIN(3, "block_plain"),
+        BLOCK_STONE(4, "block_stone"),
+        BLOCK_WALL(5, "block_wall"),
+        BLOCK_WATER(6, "block_water"),
+        BLOCK_WOOD(7, "block_wood"),
+        RAMP_NORTH(8,"ramp_north"),
+        RAMP_EAST(9, "ramp_east"),
+        RAMP_SOUTH(10, "ramp_south"),
+        RAMP_WEST(11, "ramp_west"),
+        ROOF_NORTH(12, "roof_north"),
+        ROOF_NORTHEAST(13, "roof_northeast"),
+        ROOF_EAST(14, "roof_east"),
+        ROOF_SOUTHEAST(15, "roof_southeast"),
+        ROOF_SOUTH(16, "roof_south"),
+        ROOF_SOUTHWEST(17,"roof_southwest"),
+        ROOF_WEST(18, "roof_west"),
+        ROOF_NORTHWEST(19, "roof_northwest");
 
-    private static final String[] tileNames = new String[]{ "block_brown",
-            "block_dirt", "block_grass", "block_plain", "block_stone", "block_wall",
-            "block_water", "block_wood",
+        int num;
+        String code;
 
-            "ramp_north", "ramp_east", "ramp_south", "ramp_west",
+        TileImage(int num, String code){
+            this.num = num;
+            this.code = code;
+        }
+    }
 
-            "roof_north", "roof_northeast", "roof_east", "roof_southeast",
-            "roof_south", "roof_southwest", "roof_west", "roof_northwest", };
+
+    private static final String[] tileNames = new String[]{ BLOCK_BROWN.code,
+            BLOCK_DIRT.code, BLOCK_GRASS.code, BLOCK_PLAIN.code, BLOCK_STONE.code,
+            BLOCK_WALL.code, BLOCK_WATER.code, BLOCK_WOOD.code,
+
+            RAMP_NORTH.code, RAMP_EAST.code, RAMP_SOUTH.code, RAMP_WEST.code,
+
+            ROOF_NORTH.code, ROOF_NORTHEAST.code, ROOF_EAST.code, ROOF_SOUTHEAST.code,
+            ROOF_SOUTH.code, ROOF_SOUTHWEST.code, RAMP_WEST.code, ROOF_NORTHWEST.code, };
 
     private static final String[] shadowNames = new String[]{ "shadow_east",
             "shadow_northeast", "shadow_north", "shadow_northwest", "shadow_west",
@@ -111,7 +143,7 @@ public class SquirrelWorld {
         }
     }
 
-    public void addObject( CuteObject o ) {
+    public void addObject( WorldObject o ) {
         Stack stack = stackForObject( o );
         stack.objects.add( o );
         o.stack = stack;
@@ -128,6 +160,19 @@ public class SquirrelWorld {
         System.arraycopy( stack.tiles, 0, newTiles, 0, len );
         stack.tiles = newTiles;
         stack.tiles[ len ] = type;
+    }
+
+    public void addTile( int tx, int ty, TileImage tileImage ) {
+        Stack stack = stack( tx, ty );
+        int len = stack.height();
+        if ( len == MAX_STACK_HEIGHT ) {
+            return;
+        }
+
+        int[] newTiles = new int[ len + 1 ];
+        System.arraycopy( stack.tiles, 0, newTiles, 0, len );
+        stack.tiles = newTiles;
+        stack.tiles[ len ] = tileImage.num;
     }
 
     public void removeTopTile( int tx, int ty ) {
@@ -285,7 +330,7 @@ public class SquirrelWorld {
     /**
      * Moves an object by the given vector, handling all collisions.
      */
-    private void moveBy( CuteObject o, double dx, double dy, double dz ) {
+    private void moveBy( WorldObject o, double dx, double dy, double dz ) {
         // Walls - start by getting relative heights of neighbors
         int tx = ( int ) o.x, ty = ( int ) o.y;
         int hc = ( int ) o.z;
@@ -443,7 +488,7 @@ public class SquirrelWorld {
     }
 
     private void paintObjects( Surface surf, Stack stack, int tz, float alpha ) {
-        for ( CuteObject o : stack.objects ) {
+        for ( WorldObject o : stack.objects ) {
             if ( ( int ) o.z == tz ) {
                 int px = worldToPixelX( surf, o.x( alpha ) );
                 int py = worldToPixelY( surf, o.y( alpha ), o.z( alpha ) );
@@ -525,7 +570,7 @@ public class SquirrelWorld {
         return world[ ty * worldWidth + tx ];
     }
 
-    private Stack stackForObject( CuteObject o ) {
+    private Stack stackForObject( WorldObject o ) {
         if ( ( o.x < 0 ) || ( o.y < 0 ) || ( o.x >= worldWidth ) || ( o.y >= worldHeight ) ) {
             return EMPTY_STACK;
         }
@@ -533,7 +578,7 @@ public class SquirrelWorld {
         return stack( ( int ) o.x, ( int ) o.y );
     }
 
-    private void updatePhysics( CuteObject o, double delta ) {
+    private void updatePhysics( WorldObject o, double delta ) {
         // Avoid double-updates.
         if ( o.lastUpdated == updateCounter ) {
             return;
@@ -566,7 +611,7 @@ public class SquirrelWorld {
     private void updatePhysics( Stack stack, double delta ) {
         for ( int i = 0; i < stack.objects.size(); ++i ) {
             // Run physics.
-            CuteObject o = stack.objects.get( i );
+            WorldObject o = stack.objects.get( i );
             updatePhysics( o, delta );
 
             // Re-sort.

@@ -1,23 +1,19 @@
 package squirrels.core;
 
 import static playn.core.PlayN.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import static squirrels.core.SquirrelWorld.TileImage.*;
 
 import playn.core.Game;
 import playn.core.ImmediateLayer;
 import playn.core.Json;
-import playn.core.Key;
-import playn.core.Keyboard;
 import playn.core.Pointer;
 import playn.core.Surface;
 import playn.core.util.Callback;
 
-public class Squirrels implements Game, Keyboard.Listener {
+public class Squirrels implements Game/*, Keyboard.Listener*/ {
     private static final int NUM_STARS = 10;
 
-    private static Map<Key, Integer> ADD_TILE_KEYS = new HashMap<Key, Integer>();
+    /*private static Map<Key, Integer> ADD_TILE_KEYS = new HashMap<Key, Integer>();
 
     static {
         int idx = 0;
@@ -26,38 +22,38 @@ public class Squirrels implements Game, Keyboard.Listener {
                 Key.W, Key.D, Key.S, Key.A, Key.T, Key.Y, Key.H, Key.N, Key.B, Key.V, Key.F, Key.R } ) {
             ADD_TILE_KEYS.put( key, idx++ );
         }
-    }
+    }*/
 
     private ImmediateLayer gameLayer;
     private float frameAlpha;
 
     private SquirrelWorld world;
-    private CuteObject catGirl;
-    private CuteObject[] stars;
+    private WorldObject catGirl;
+    private WorldObject[] stars;
 
-    private boolean controlLeft, controlRight, controlUp, controlDown;
-    private boolean controlJump;
+    /*private boolean controlLeft, controlRight, controlUp, controlDown;
+    private boolean controlJump;*/
     private float touchVectorX, touchVectorY;
 
     @Override
     public void init() {
         // graphics().setSize(800, 600);
 
-        keyboard().setListener( this );
+        //keyboard().setListener( this );
         pointer().setListener( new Pointer.Listener() {
             @Override
             public void onPointerEnd( Pointer.Event event ) {
-                touchVectorX = touchVectorY = 0;
+                touchMove( event.x(), event.y() );
             }
 
             @Override
             public void onPointerDrag( Pointer.Event event ) {
-                touchMove( event.x(), event.y() );
+                //touchMove( event.x(), event.y() );
             }
 
             @Override
             public void onPointerStart( Pointer.Event event ) {
-                touchMove( event.x(), event.y() );
+                //touchMove( event.x(), event.y() );
             }
         } );
 
@@ -84,32 +80,32 @@ public class Squirrels implements Game, Keyboard.Listener {
         // Grass.
         for ( int y = 0; y < 16; ++y ) {
             for ( int x = 0; x < 16; ++x ) {
-                world.addTile( x, y, 2 );
+                world.addTile( x, y, BLOCK_GRASS );
             }
         }
 
         // And a little house.
-        for ( int i = 0; i < 2; ++i ) {
-            world.addTile( 4, 4, 7 );
-            world.addTile( 5, 4, 7 );
-            world.addTile( 6, 4, 7 );
-            world.addTile( 4, 5, 7 );
-            world.addTile( 5, 5, 7 );
-            world.addTile( 6, 5, 7 );
-            world.addTile( 4, 6, 7 );
-            world.addTile( 5, 6, 3 );
-            world.addTile( 6, 6, 7 );
-        }
+        /*for ( int i = 0; i < 2; ++i ) {*/
+            /*world.addTile( 4, 4, BLOCK_WOOD );
+            world.addTile( 5, 4, BLOCK_WOOD );
+            world.addTile( 6, 4, BLOCK_WOOD );
+            world.addTile( 4, 5, BLOCK_WOOD );*/
+            //world.addTile( 5, 5, BLOCK_WOOD );
+            /*world.addTile( 6, 5, BLOCK_WOOD );
+            world.addTile( 4, 6, BLOCK_WOOD );
+            world.addTile( 5, 6, BLOCK_WOOD );
+            world.addTile( 6, 6, BLOCK_WOOD );*/
+        /*}*/
 
-        world.addTile( 4, 4, 19 );
-        world.addTile( 5, 4, 12 );
-        world.addTile( 6, 4, 13 );
-        world.addTile( 4, 5, 18 );
-        world.addTile( 5, 5, 5 );
-        world.addTile( 6, 5, 14 );
-        world.addTile( 4, 6, 17 );
-        world.addTile( 5, 6, 16 );
-        world.addTile( 6, 6, 15 );
+        /*world.addTile( 4, 4, ROOF_NORTHWEST );
+        world.addTile( 5, 4, ROOF_NORTH );
+        world.addTile( 6, 4, ROOF_NORTHEAST );
+        world.addTile( 4, 5, ROOF_WEST );*/
+        world.addTile( 5, 5, BLOCK_WALL );
+        /*world.addTile( 6, 5, ROOF_EAST );
+        world.addTile( 4, 6, ROOF_SOUTHWEST );
+        world.addTile( 5, 6, ROOF_SOUTH );
+        world.addTile( 6, 6, ROOF_SOUTHEAST);*/
 
         // create an immediate layer that handles all of our rendering
         gameLayer = graphics().createImmediateLayer( new ImmediateLayer.Renderer() {
@@ -125,21 +121,21 @@ public class Squirrels implements Game, Keyboard.Listener {
     }
 
     private void initStuff() {
-        catGirl = new CuteObject( assets().getImage( "images/character_cat_girl.png" ) );
+        catGirl = new WorldObject( assets().getImage( "images/character_cat_girl.png" ) );
         catGirl.setPos( 2, 2, 1 );
         catGirl.r = 0.3;
         world.addObject( catGirl );
 
-        stars = new CuteObject[ NUM_STARS ];
+        stars = new WorldObject[ NUM_STARS ];
         for ( int i = 0; i < NUM_STARS; ++i ) {
-            stars[ i ] = new CuteObject( assets().getImage( "images/star.png" ) );
+            stars[ i ] = new WorldObject( assets().getImage( "images/star.png" ) );
             stars[ i ].setPos( Math.random() * world.worldWidth(), Math.random()
                     * world.worldHeight(), 10 );
             world.addObject( stars[ i ] );
         }
     }
 
-    @Override
+    /*@Override
     public void onKeyDown( Keyboard.Event event ) {
         Integer tileIdx = ADD_TILE_KEYS.get( event.key() );
         if ( tileIdx != null ) {
@@ -190,7 +186,7 @@ public class Squirrels implements Game, Keyboard.Listener {
                 controlDown = false;
                 break;
         }
-    }
+    }*/
 
     @Override
     public void update( float delta ) {
@@ -202,7 +198,7 @@ public class Squirrels implements Game, Keyboard.Listener {
 
         if ( catGirl.isResting() ) {
             // Keyboard control.
-            if ( controlLeft ) {
+            /*if ( controlLeft ) {
                 catGirl.ax = -1.0;
             }
             if ( controlRight ) {
@@ -213,17 +209,17 @@ public class Squirrels implements Game, Keyboard.Listener {
             }
             if ( controlDown ) {
                 catGirl.ay = 1.0;
-            }
+            }*/
 
             // Mouse Control.
             catGirl.ax += touchVectorX;
             catGirl.ay += touchVectorY;
 
             // Jump Control.
-            if ( controlJump ) {
+            /*if ( controlJump ) {
                 catGirl.vz = 0.2;
                 controlJump = false;
-            }
+            }*/
         }
 
         world.updatePhysics( delta / 1000 );
